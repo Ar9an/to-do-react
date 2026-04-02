@@ -1,48 +1,53 @@
-// App.jsx - Root Component
-// Saari state yahan hai
-// Saare functions yahan hain
-// Props ke through neeche jaate hain
+import { useState } from "react";
+import { FormProvider } from "./context/FormContext";
+import FormPage from "./pages/FormPage";
+import SubmitPage from "./pages/SubmitPage";
+import "./styles.css";
 
-import { useState, useEffect } from "react";
-import { getTodos, addTodo, deleteTodo } from "./data";
-import AddTodo from "./components/AddTodo";
-import TodoList from "./components/TodoList";
+const App = () => {
+  const [page, setPage] = useState("form");
 
-function App() {
-  const [todos, setTodos] = useState([]);
-
-  // GET - pehli baar data load karo
-  useEffect(function() {
-    const data = getTodos();
-    setTodos(data);
-  }, []);
-
-  // POST - naya todo banana
-  function handleAdd(text) {
-    const newTodo = {
-      id: Date.now(),
-      text: text,
-      done: false,
-    };
-    addTodo(newTodo);
-    setTodos(getTodos());
-  }
-
-  // DELETE - todo hatana
-  function handleDelete(id) {
-    deleteTodo(id);
-    setTodos(getTodos());
-  }
+  const navigate = (target) => setPage(target);
 
   return (
-    <div>
-      <h1>Todo App</h1>
+    <FormProvider>
+      <div className="app">
+        {/* Nav */}
+        <nav className="navbar">
+          <div className="nav-logo">
+            <div className="logo-dot" />
+            <span>FormFlow</span>
+          </div>
+          <div className="nav-steps">
+            <button
+              className={`nav-step ${page === "form" ? "active" : ""}`}
+              onClick={() => navigate("form")}
+            >
+              <span className="step-num">1</span>
+              <span>Fill Form</span>
+            </button>
+            <div className="step-divider" />
+            <button
+              className={`nav-step ${page === "submit" ? "active" : ""}`}
+              onClick={() => navigate("submit")}
+            >
+              <span className="step-num">2</span>
+              <span>Submit</span>
+            </button>
+          </div>
+        </nav>
 
-      <AddTodo onAdd={handleAdd} />
-
-      <TodoList todos={todos} onDelete={handleDelete} />
-    </div>
+        {/* Pages */}
+        <main className="main">
+          {page === "form" ? (
+            <FormPage onNavigate={navigate} />
+          ) : (
+            <SubmitPage onNavigate={navigate} />
+          )}
+        </main>
+      </div>
+    </FormProvider>
   );
-}
+};
 
 export default App;
